@@ -1,173 +1,235 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tom's Dogs – Service Area</title>
+<!-- =========================
+ Geoapify Isoline Map
+ Carrd Single-Embed Version
+ ========================= -->
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css?family=Nunito:300,400,500,600,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin=""
+/>
 
 <style>
-:root{
-  --green:#315532;
-  --sage:#5E7C60;
-  --cream:#FFF6E5;
-  --cream2:#F7F4ED;
-  --orange:#D9772A;
-  --deep:#253F26;
-  --panel: rgba(15,27,18,0.58);
-  --panelBorder: rgba(255,246,229,0.18);
-  --outline: rgba(94,124,96,0.55);
-  --shadow1: rgba(37,63,38,0.22);
-  --shadow2: rgba(37,63,38,0.12);
-}
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
 
-html,body{
-  height:100%;
-  margin:0;
-  background:transparent;
-  font-family:"Nunito",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  overflow:hidden;
-}
+  .geo-app {
+    height: 600px;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+  }
 
-.shell{
-  position:relative;
-  height:100%;
-  width:100%;
-  border-radius:18px;
-  overflow:hidden;
-  border:1px solid var(--outline);
-  background:rgba(37,63,38,0.18);
-  box-shadow:0 10px 24px var(--shadow1),0 2px 8px var(--shadow2);
-}
+  @media (max-width: 800px) {
+    .geo-app {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 420px;
+      height: auto;
+    }
+  }
 
-#map{ position:absolute; inset:0; }
+  #geo-sidebar {
+    padding: 14px;
+    border-right: 1px solid #eee;
+    overflow: auto;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    background: #fafafa;
+  }
 
-.badge{
-  position:absolute;
-  left:12px;
-  bottom:12px;
-  z-index:600;
-  padding:8px 12px;
-  border-radius:999px;
-  background:var(--panel);
-  border:1px solid var(--panelBorder);
-  color:var(--cream2);
-  font-size:12px;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  backdrop-filter:blur(6px);
-  user-select:none;
-}
+  #geo-sidebar h1 {
+    margin: 0 0 10px;
+    font-size: 16px;
+  }
 
-.btn{
-  position:absolute;
-  right:12px;
-  bottom:12px;
-  z-index:600;
-  padding:9px 14px;
-  border-radius:999px;
-  background:rgba(49,85,50,.65);
-  border:1px solid rgba(255,246,229,.18);
-  color:var(--cream2);
-  text-decoration:none;
-  font-size:12px;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  transition:transform 140ms ease,background 160ms ease;
-}
+  #geo-sidebar .meta {
+    color: #333;
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
 
-.btn:hover{
-  transform:translateY(-1px);
-  background:rgba(49,85,50,.82);
-}
+  .geo-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: #eef3ff;
+    border: 1px solid #dbe7ff;
+    font-size: 12px;
+    margin-right: 6px;
+  }
+
+  .geo-legend {
+    margin-top: 12px;
+  }
+
+  .geo-legend-item {
+    display: flex;
+    align-items: center;
+    margin: 6px 0;
+  }
+
+  .geo-swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+    margin-right: 8px;
+  }
+
+  #geo-map {
+    height: 100%;
+    width: 100%;
+  }
 </style>
-</head>
 
-<body>
-<div class="shell">
-  <div id="map"></div>
-  <div class="badge">New London County</div>
-  <a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps?q=New+London+County,+CT">
-    Open in Google Maps
-  </a>
+<div class="geo-app">
+  <aside id="geo-sidebar">
+    <h1>Drive-Time Reach Map</h1>
+
+    <div class="meta">
+      <span class="geo-badge">Leaflet</span>
+      <span class="geo-badge">Geoapify</span>
+      <span class="geo-badge">Isoline API</span>
+    </div>
+
+    <div id="geo-summary">Loading…</div>
+    <div class="geo-legend" id="geo-legend"></div>
+
+    <p style="margin-top:10px;">
+      Each colored region shows how far you can drive within the displayed
+      time window from the starting location.
+    </p>
+  </aside>
+
+  <div id="geo-map"></div>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""
+></script>
 
 <script>
-const GEOJSON =
-  'https://geodata.ct.gov/api/download/v1/items/851b3129c0eb4a269c58dbca69072227/geojson?layers=1';
+(() => {
 
-/* Strong county detection */
-function isNewLondonCounty(props){
-  if (!props) return false;
+  const apiKey = "f82ea38cb77543d59c597faaa263e714";
 
-  const values = Object.values(props)
-    .filter(v => typeof v === 'string')
-    .map(v => v.toLowerCase());
+  const lat = 30.332039;
+  const lon = -81.601305;
 
-  return values.some(v =>
-    v === 'new london county' ||
-    v === 'new london' ||
-    v.includes('new london county')
-  );
-}
+  const map = L.map("geo-map").setView([lat, lon], 10);
 
-/* Init map */
-const map = L.map('map',{
-  zoomControl:true,
-  scrollWheelZoom:false,
-  preferCanvas:true
-});
+  const isRetina = L.Browser.retina;
+  const baseUrl =
+    "https://maps.geoapify.com/v1/tile/osm-bright-grey/{z}/{x}/{y}.png?apiKey={apiKey}";
+  const retinaUrl =
+    "https://maps.geoapify.com/v1/tile/osm-bright-grey/{z}/{x}/{y}@2x.png?apiKey={apiKey}";
 
-/* Basemap */
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
-  maxZoom:18,
-  attribution:'&copy; OpenStreetMap &copy; CARTO'
-}).addTo(map);
+  L.tileLayer(isRetina ? retinaUrl : baseUrl, {
+    maxZoom: 20,
+    apiKey
+  }).addTo(map);
 
-/* Safe CT coastline fallback */
-map.setView([41.45,-72.10],10);
+  map.createPane("isoline-fill");
+  map.getPane("isoline-fill").style.zIndex = 400;
 
-/* Iframe sizing hardening */
-function stabilize(){
-  map.invalidateSize(true);
-}
-window.addEventListener('load',()=>{
-  setTimeout(stabilize,80);
-  setTimeout(stabilize,260);
-  setTimeout(stabilize,900);
-});
-window.addEventListener('resize',()=>setTimeout(stabilize,50));
+  map.createPane("markers-top");
+  map.getPane("markers-top").style.zIndex = 650;
 
-/* County highlight style */
-const countyStyle={
-  color:'#D9772A',
-  weight:2,
-  opacity:.95,
-  fillColor:'#315532',
-  fillOpacity:.30
-};
+  const originIcon = L.icon({
+    iconUrl: `https://api.geoapify.com/v2/icon/?type=circle&color=%23d784c2&strokeColor=%231e3a8a&size=42&icon=car&iconType=awesome&contentSize=24&noWhiteCircle&scaleFactor=2&apiKey=${apiKey}`,
+    iconSize: [42, 42],
+    iconAnchor: [21, 21],
+    popupAnchor: [0, -25]
+  });
 
-/* Load counties and highlight New London */
-fetch(GEOJSON,{mode:'cors'})
-  .then(r=>r.json())
-  .then(fc=>{
-    const target = fc.features.filter(f=>isNewLondonCounty(f.properties));
-    if(!target.length) return;
+  L.marker([lat, lon], { icon: originIcon, pane: "markers-top" })
+    .addTo(map)
+    .bindPopup("Origin");
 
-    const layer = L.geoJSON(target,{style:countyStyle}).addTo(map);
+  const url = `https://api.geoapify.com/v1/isoline?lat=${lat}&lon=${lon}&type=time&mode=drive&range=900,1200,1800,2400,3000&apiKey=${apiKey}`;
 
-    setTimeout(()=>{
-      map.invalidateSize(true);
-      map.fitBounds(layer.getBounds(),{padding:[20,20],animate:false});
-    },140);
-  })
-  .catch(()=>{});
+  const palette = [
+    "#fff3bf",
+    "#b2f2bb",
+    "#a5d8ff",
+    "#d0bfff",
+    "#ffc9c9",
+    "#ffd8a8"
+  ];
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      const ranges = [...new Set(
+        data.features.map(f => f.properties?.range).filter(r => typeof r === "number")
+      )].sort((a, b) => a - b);
+
+      const colorByRange = {};
+      ranges.forEach((r, i) => {
+        colorByRange[r] = palette[Math.min(i, palette.length - 1)];
+      });
+
+      updateSummaryAndLegend(ranges, colorByRange);
+      drawIsolines(data, colorByRange);
+    });
+
+  const toMinutes = s => Math.round(s / 60);
+  const rangeLabel = r => `${toMinutes(r)} min`;
+
+  function updateSummaryAndLegend(ranges, colorByRange) {
+    document.getElementById("geo-summary").textContent =
+      `Drive time ranges: ${ranges.map(rangeLabel).join(", ")}`;
+
+    const legend = document.getElementById("geo-legend");
+    legend.innerHTML = "<strong>Legend</strong>";
+
+    ranges.forEach(r => {
+      const row = document.createElement("div");
+      row.className = "geo-legend-item";
+      row.innerHTML = `
+        <span class="geo-swatch" style="background:${colorByRange[r]}"></span>
+        ${rangeLabel(r)}
+      `;
+      legend.appendChild(row);
+    });
+  }
+
+  function drawIsolines(data, colorByRange) {
+    data.features.sort((a, b) => b.properties.range - a.properties.range);
+
+    L.geoJSON(data, {
+      pane: "isoline-fill",
+      style: feature => ({
+        color: "#1e3a8a",
+        weight: 1.5,
+        opacity: 0.85,
+        fillColor: colorByRange[feature.properties.range] || "#74c0fc",
+        fillOpacity: 0.35
+      }),
+      onEachFeature: (feature, layer) => {
+        const r = feature.properties?.range;
+        if (r) {
+          layer.bindPopup(`Reachable within ${rangeLabel(r)}`);
+        }
+
+        layer.on("mouseover", () =>
+          layer.setStyle({ weight: 2.5, fillOpacity: 0.45 })
+        );
+        layer.on("mouseout", () =>
+          layer.setStyle({ weight: 1.5, fillOpacity: 0.35 })
+        );
+      }
+    }).addTo(map);
+  }
+
+})();
 </script>
-</body>
-</html>
