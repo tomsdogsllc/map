@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Tom's Dogs – Service Area</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,500,600,700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <style>
+    :root{
+      --green:#315532;
+      --sage:#5E7C60;
+      --cream:#FFF6E5;
+      --cream2:#F7F4ED;
+      --orange:#D9772A;
+      --deep:#253F26;
+    }
+
+    html,body{
+      margin:0;
+      height:100%;
+      background:#2b3638;
+      font-family:"Nunito",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    }
+
+    .wrap{
+      height:100%;
+      padding:12px;
+      display:flex;
+      justify-content:center;
+      align-items:stretch;
+    }
+
+    .shell{
+      width:100%;
+      max-width:1100px;
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid rgba(94,124,96,.55);
+      background:rgba(37,63,38,.18);
+      box-shadow:0 10px 24px rgba(37,63,38,.22),
+                 0 2px 8px rgba(37,63,38,.12);
+      position:relative;
+    }
+
+    #map{
+      width:100%;
+      height:100%;
+      min-height:260px;
+    }
+
+    .badge{
+      position:absolute;
+      left:12px;
+      bottom:12px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(15,27,18,.6);
+      border:1px solid rgba(255,246,229,.2);
+      color:var(--cream2);
+      font-size:12px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      backdrop-filter:blur(6px);
+      z-index:500;
+    }
+
+    .actions{
+      position:absolute;
+      right:12px;
+      bottom:12px;
+      z-index:500;
+    }
+
+    .btn{
+      padding:9px 14px;
+      border-radius:999px;
+      background:rgba(49,85,50,.65);
+      border:1px solid rgba(255,246,229,.2);
+      color:var(--cream2);
+      text-decoration:none;
+      font-size:12px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      transition:.15s ease;
+    }
+
+    .btn:hover{
+      background:rgba(49,85,50,.85);
+      transform:translateY(-1px);
+    }
+
+    .leaflet-control-zoom a{
+      background:rgba(15,27,18,.7);
+      color:var(--cream2);
+      border:1px solid rgba(255,246,229,.2);
+    }
+
+    .leaflet-control-attribution{
+      background:rgba(15,27,18,.4);
+      color:rgba(247,244,237,.85);
+    }
+
+    .leaflet-control-attribution a{
+      color:rgba(247,244,237,.9);
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="wrap">
+  <div class="shell">
+    <div id="map"></div>
+    <div class="badge">New London County</div>
+    <div class="actions">
+      <a class="btn" target="_blank" href="https://www.google.com/maps?q=New+London+County,+CT">
+        Open in Google Maps
+      </a>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  const map = L.map('map', {
+    zoomControl:true,
+    scrollWheelZoom:false
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    maxZoom:18,
+    attribution:'&copy; OpenStreetMap &copy; CARTO'
+  }).addTo(map);
+
+  map.setView([41.45,-72.1],10);
+
+  setTimeout(()=>map.invalidateSize(),300);
+  setTimeout(()=>map.invalidateSize(),900);
+
+  const style = {
+    color:'#D9772A',
+    weight:2,
+    opacity:.95,
+    fillColor:'#315532',
+    fillOpacity:.32
+  };
+
+  const GEOJSON =
+    'https://geodata.ct.gov/api/download/v1/items/851b3129c0eb4a269c58dbca69072227/geojson?layers=1';
+
+  function isNewLondon(p){
+    if(!p) return false;
+    return Object.values(p).some(v =>
+      typeof v === 'string' && v.toLowerCase().includes('new london')
+    );
+  }
+
+  fetch(GEOJSON)
+    .then(r=>r.json())
+    .then(fc=>{
+      const f = fc.features.filter(x=>isNewLondon(x.properties));
+      const layer = L.geoJSON(f,{style}).addTo(map);
+      map.fitBounds(layer.getBounds(),{padding:[18,18]});
+    });
+</script>
+
+</body>
+</html>
