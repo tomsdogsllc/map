@@ -118,8 +118,8 @@
     .setView([origin.lat + 0.085, origin.lon], 11);
 
   const isRetina = L.Browser.retina;
-  const baseUrl = "https://maps.geoapify.com/v1/tile/osm-bright-grey/{z}/{x}/{y}.png?apiKey={apiKey}";
-  const retinaUrl = "https://maps.geoapify.com/v1/tile/osm-bright-grey/{z}/{x}/{y}@2x.png?apiKey={apiKey}";
+  const baseUrl = "https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}.png?apiKey={apiKey}";
+const retinaUrl = "https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}@2x.png?apiKey={apiKey}";
 
   L.tileLayer(isRetina ? retinaUrl : baseUrl, { maxZoom: 20, apiKey }).addTo(map);
 
