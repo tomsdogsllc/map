@@ -115,7 +115,8 @@
   const rangesMeters = bandsMiles.map(milesToMeters);
 
   const map = L.map("td-geo-map", { scrollWheelZoom: false })
-.setView([origin.lat + 0.085, origin.lon], 11);
+    .setView([origin.lat, origin.lon], 11);
+
   const isRetina = L.Browser.retina;
   const baseUrl = "https://maps.geoapify.com/v1/tile/osm-bright-grey/{z}/{x}/{y}.png?apiKey={apiKey}";
   const retinaUrl = "https://maps.geoapify.com/v1/tile/osm-bright-grey/{z}/{x}/{y}@2x.png?apiKey={apiKey}";
