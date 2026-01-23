@@ -1,6 +1,8 @@
 <!-- =========================
- Geoapify Isoline Map
- Carrd Single-Embed Version
+ Geoapify Isoline Map (New London, CT)
+ Home Base: Toby May Park
+ Carrd Single-Embed Version (Tom's Dogs styled)
+ Travel fee zones by DRIVING MILES
  ========================= -->
 
 <link
@@ -11,101 +13,264 @@
 />
 
 <style>
-  html, body {
-    height: 100%;
-    margin: 0;
+  :root{
+    --td-cream:#FFF6E5;
+    --td-cream-2:#F7F4ED;
+    --td-deep:#0f1b12;
+    --td-green:#315532;
+    --td-sage:#5E7C60;
+    --td-accent:#D9772A;
+
+    --td-ink: rgba(15,27,18,0.92);
+    --td-border: rgba(49,85,50,0.20);
+    --td-border-strong: rgba(49,85,50,0.32);
+    --td-panel: rgba(94,124,96,0.12);
+    --td-shadow: 0 16px 38px rgba(15,27,18,0.18);
+    --td-shadow-soft: 0 12px 28px rgba(15,27,18,0.12);
+
+    --td-radius: 18px;
+    --td-radius-sm: 14px;
   }
 
-  .geo-app {
-    height: 600px;
+  html, body { height: 100%; margin: 0; background:#fff; }
+
+  .geo-app{
+    height: 640px;
     display: grid;
-    grid-template-columns: 320px 1fr;
-    border-radius: 14px;
+    grid-template-columns: 360px 1fr;
+    gap: 14px;
+    padding: 14px;
+    box-sizing: border-box;
+
+    border-radius: var(--td-radius);
     overflow: hidden;
-    background: #fff;
-    border: 1px solid #e5e7eb;
+
+    background:
+      radial-gradient(1200px 800px at 18% -10%, rgba(94,124,96,0.20), transparent 60%),
+      radial-gradient(900px 650px at 92% 0%, rgba(217,119,42,0.12), transparent 65%),
+      #fff;
+    border: 1px solid var(--td-border);
   }
 
-  @media (max-width: 800px) {
-    .geo-app {
+  @media (max-width: 800px){
+    .geo-app{
       grid-template-columns: 1fr;
-      grid-template-rows: auto 420px;
+      grid-template-rows: auto 460px;
       height: auto;
+      padding: 12px;
     }
   }
 
-  #geo-sidebar {
-    padding: 14px;
-    border-right: 1px solid #eee;
+  #geo-sidebar{
+    padding: 16px;
+    border: 1px solid var(--td-border);
+    border-radius: var(--td-radius);
     overflow: auto;
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+    font-family: "Nunito", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     font-size: 14px;
     line-height: 1.45;
-    background: #fafafa;
+
+    background: linear-gradient(180deg, rgba(255,246,229,0.82), rgba(94,124,96,0.10));
+    box-shadow: var(--td-shadow-soft);
   }
 
-  #geo-sidebar h1 {
+  #geo-sidebar h1{
     margin: 0 0 10px;
     font-size: 16px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    font-weight: 900;
+    color: var(--td-ink);
   }
 
-  #geo-sidebar .meta {
-    color: #333;
+  #geo-sidebar .meta{
+    color: rgba(15,27,18,0.76);
     font-size: 13px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
   }
 
-  .geo-badge {
+  .geo-badge{
     display: inline-block;
-    padding: 2px 6px;
-    border-radius: 6px;
-    background: #eef3ff;
-    border: 1px solid #dbe7ff;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: rgba(94,124,96,0.14);
+    border: 1px solid rgba(49,85,50,0.20);
     font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.02em;
     margin-right: 6px;
+    margin-bottom: 6px;
   }
 
-  .geo-legend {
-    margin-top: 12px;
+  #geo-summary{
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: var(--td-radius-sm);
+    border: 1px solid rgba(49,85,50,0.16);
+    background: rgba(247,244,237,0.78);
+    box-shadow: 0 10px 22px rgba(15,27,18,0.08);
+    color: rgba(15,27,18,0.90);
   }
 
-  .geo-legend-item {
+  .geo-legend{ margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(49,85,50,0.16); }
+
+  .geo-legend .geo-legend-title{
+    font-weight: 900;
+    letter-spacing: 0.02em;
+    margin-bottom: 10px;
+    color: rgba(15,27,18,0.90);
+  }
+
+  .geo-legend-item{
     display: flex;
     align-items: center;
-    margin: 6px 0;
+    justify-content: space-between;
+    gap: 10px;
+
+    margin: 10px 0;
+    padding: 10px 10px;
+    border-radius: 14px;
+
+    border: 1px solid rgba(49,85,50,0.16);
+    background: rgba(247,244,237,0.78);
+    box-shadow: 0 10px 20px rgba(15,27,18,0.08);
   }
 
-  .geo-swatch {
+  .geo-legend-item .left{
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .geo-legend-item strong{
+    color: var(--td-green);
+    font-weight: 900;
+  }
+
+  .geo-swatch{
     width: 16px;
     height: 16px;
-    border-radius: 4px;
-    border: 1px solid #cbd5e1;
-    margin-right: 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(15,27,18,0.18);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.55);
   }
 
-  #geo-map {
+  .geo-panel{
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(49,85,50,0.16);
+    background: rgba(247,244,237,0.78);
+    box-shadow: 0 10px 22px rgba(15,27,18,0.08);
+  }
+
+  .geo-panel-title{
+    font-weight: 900;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+    color: rgba(15,27,18,0.90);
+    text-transform: uppercase;
+  }
+
+  .geo-list{ margin: 0; padding-left: 18px; }
+  .geo-list li{ margin: 6px 0; }
+
+  .geo-note{
+    margin-top: 10px;
+    font-size: 12px;
+    color: rgba(15,27,18,0.74);
+  }
+
+  .geo-tip{
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(217,119,42,0.22);
+    background: rgba(217,119,42,0.10);
+    color: rgba(15,27,18,0.86);
+  }
+
+  #geo-map{
     height: 100%;
     width: 100%;
+    border-radius: var(--td-radius);
+    border: 1px solid var(--td-border);
+    box-shadow: var(--td-shadow);
+    overflow: hidden;
+    background: #fff;
+  }
+
+  /* Leaflet controls + popups */
+  .leaflet-control-zoom,
+  .leaflet-control-attribution{
+    border-radius: 14px !important;
+    overflow: hidden;
+  }
+  .leaflet-control-zoom a{
+    background: rgba(247,244,237,0.92) !important;
+    color: rgba(15,27,18,0.88) !important;
+    border: 0 !important;
+  }
+  .leaflet-control-zoom a:hover{
+    background: rgba(255,246,229,0.98) !important;
+  }
+  .leaflet-control-attribution{
+    background: rgba(247,244,237,0.82) !important;
+    color: rgba(15,27,18,0.70) !important;
+    border: 1px solid rgba(49,85,50,0.14) !important;
+    box-shadow: 0 10px 20px rgba(15,27,18,0.10);
+  }
+  .leaflet-popup-content-wrapper{
+    border-radius: 16px !important;
+    border: 1px solid rgba(49,85,50,0.18);
+    background: rgba(255,246,229,0.96) !important;
+    color: rgba(15,27,18,0.92);
+    box-shadow: 0 18px 34px rgba(15,27,18,0.18);
+  }
+  .leaflet-popup-tip{
+    background: rgba(255,246,229,0.96) !important;
+    border: 1px solid rgba(49,85,50,0.14);
   }
 </style>
 
 <div class="geo-app">
   <aside id="geo-sidebar">
-    <h1>Drive-Time Reach Map</h1>
+    <h1>Travel Fee Zones</h1>
 
     <div class="meta">
       <span class="geo-badge">Leaflet</span>
       <span class="geo-badge">Geoapify</span>
-      <span class="geo-badge">Isoline API</span>
+      <span class="geo-badge">Driving miles</span>
     </div>
 
     <div id="geo-summary">Loading…</div>
+
     <div class="geo-legend" id="geo-legend"></div>
 
-    <p style="margin-top:10px;">
-      Each colored region shows how far you can drive within the displayed
-      time window from the starting location.
-    </p>
+    <div class="geo-panel">
+      <div class="geo-panel-title">Home Base</div>
+      <div id="geo-origin">Toby May Park, New London, CT</div>
+    </div>
+
+    <div class="geo-panel">
+      <div class="geo-panel-title">Travel Fee (per visit)</div>
+      <ul class="geo-list" id="geo-travel-list">
+        <li><strong>Free</strong> travel within <strong>15 miles</strong></li>
+        <li><strong>15–20 miles:</strong> +$5 per visit</li>
+        <li><strong>20–25 miles:</strong> +$10 per visit</li>
+        <li><strong>25–30 miles:</strong> +$15 per visit</li>
+        <li><strong>30+ miles:</strong> custom quote</li>
+      </ul>
+      <div class="geo-note" id="geo-travel-note">
+        Zones represent approximate driving distance from Home Base.
+      </div>
+    </div>
+
+    <div class="geo-tip">
+      Tip: the colored zones reflect your travel fee tiers. Anything outside the 30-mile zone is custom quote.
+    </div>
   </aside>
 
   <div id="geo-map"></div>
@@ -119,13 +284,29 @@
 
 <script>
 (() => {
-
   const apiKey = "f82ea38cb77543d59c597faaa263e714";
 
-  const lat = 30.332039;
-  const lon = -81.601305;
+  // Toby May Park (more precise than your previous New London center point)
+  const lat = 41.3274358;
+  const lon = -72.1034902;
 
-  const map = L.map("geo-map").setView([lat, lon], 10);
+  const originLabel = "Home Base: Toby May Park (New London, CT)";
+  document.getElementById("geo-origin").textContent = "Toby May Park, New London, CT (Home Base)";
+
+  // Distance bands in miles (these align directly to your travel fees)
+  const bandsMiles = [15, 20, 25, 30];
+  const milesToMeters = mi => Math.round(mi * 1609.344);
+  const rangesMeters = bandsMiles.map(milesToMeters);
+
+  // Legend labels + fees
+  const feeRows = [
+    { label: "0–15 miles", fee: "$0 (free)" },
+    { label: "15–20 miles", fee: "+$5 per visit" },
+    { label: "20–25 miles", fee: "+$10 per visit" },
+    { label: "25–30 miles", fee: "+$15 per visit" }
+  ];
+
+  const map = L.map("geo-map").setView([lat, lon], 11);
 
   const isRetina = L.Browser.retina;
   const baseUrl =
@@ -145,91 +326,124 @@
   map.getPane("markers-top").style.zIndex = 650;
 
   const originIcon = L.icon({
-    iconUrl: `https://api.geoapify.com/v2/icon/?type=circle&color=%23d784c2&strokeColor=%231e3a8a&size=42&icon=car&iconType=awesome&contentSize=24&noWhiteCircle&scaleFactor=2&apiKey=${apiKey}`,
-    iconSize: [42, 42],
-    iconAnchor: [21, 21],
-    popupAnchor: [0, -25]
+    iconUrl: `https://api.geoapify.com/v2/icon/?type=circle&color=%23315532&strokeColor=%230f1b12&size=44&icon=home&iconType=awesome&contentSize=24&noWhiteCircle&scaleFactor=2&apiKey=${apiKey}`,
+    iconSize: [44, 44],
+    iconAnchor: [22, 22],
+    popupAnchor: [0, -26]
   });
 
   L.marker([lat, lon], { icon: originIcon, pane: "markers-top" })
     .addTo(map)
-    .bindPopup("Origin");
+    .bindPopup(originLabel);
 
-  const url = `https://api.geoapify.com/v1/isoline?lat=${lat}&lon=${lon}&type=time&mode=drive&range=900,1200,1800,2400,3000&apiKey=${apiKey}`;
+  // Geoapify distance isolines (meters)
+  const url =
+    `https://api.geoapify.com/v1/isoline?lat=${lat}&lon=${lon}` +
+    `&type=distance&mode=drive&range=${rangesMeters.join(",")}&apiKey=${apiKey}`;
 
-  const palette = [
-    "#fff3bf",
-    "#b2f2bb",
-    "#a5d8ff",
-    "#d0bfff",
-    "#ffc9c9",
-    "#ffd8a8"
-  ];
+  // Palette light → dark by increasing distance
+  const palette = ["#fff3bf", "#b2f2bb", "#a5d8ff", "#d0bfff", "#ffc9c9", "#ffd8a8"];
 
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      const ranges = [...new Set(
-        data.features.map(f => f.properties?.range).filter(r => typeof r === "number")
-      )].sort((a, b) => a - b);
+  const metersToMiles = m => m / 1609.344;
+  const round1 = n => Math.round(n * 10) / 10;
 
-      const colorByRange = {};
-      ranges.forEach((r, i) => {
-        colorByRange[r] = palette[Math.min(i, palette.length - 1)];
-      });
+  function renderSummary() {
+    const summary = document.getElementById("geo-summary");
+    summary.innerHTML =
+      `<strong>Travel fee zones</strong><br>` +
+      `0–15 mi: $0, 15–20: +$5, 20–25: +$10, 25–30: +$15<br>` +
+      `<span style="opacity:0.85;">Outside 30 miles: custom quote.</span>`;
+  }
 
-      updateSummaryAndLegend(ranges, colorByRange);
-      drawIsolines(data, colorByRange);
-    });
-
-  const toMinutes = s => Math.round(s / 60);
-  const rangeLabel = r => `${toMinutes(r)} min`;
-
-  function updateSummaryAndLegend(ranges, colorByRange) {
-    document.getElementById("geo-summary").textContent =
-      `Drive time ranges: ${ranges.map(rangeLabel).join(", ")}`;
-
+  function renderLegend(colorByRangeMeters){
     const legend = document.getElementById("geo-legend");
-    legend.innerHTML = "<strong>Legend</strong>";
+    legend.innerHTML = `<div class="geo-legend-title">Legend</div>`;
 
-    ranges.forEach(r => {
-      const row = document.createElement("div");
-      row.className = "geo-legend-item";
-      row.innerHTML = `
-        <span class="geo-swatch" style="background:${colorByRange[r]}"></span>
-        ${rangeLabel(r)}
+    feeRows.forEach((row, i) => {
+      const maxMi = bandsMiles[i];
+      const col = colorByRangeMeters[milesToMeters(maxMi)] || "#74c0fc";
+
+      const item = document.createElement("div");
+      item.className = "geo-legend-item";
+      item.innerHTML = `
+        <span class="left">
+          <span class="geo-swatch" style="background:${col}"></span>
+          <span>${row.label}</span>
+        </span>
+        <strong>${row.fee}</strong>
       `;
-      legend.appendChild(row);
+      legend.appendChild(item);
     });
+
+    const note = document.createElement("div");
+    note.className = "geo-note";
+    note.textContent = "Outside the 30-mile zone: custom quote.";
+    legend.appendChild(note);
   }
 
   function drawIsolines(data, colorByRange) {
+    // Draw larger first so smaller sits on top
     data.features.sort((a, b) => b.properties.range - a.properties.range);
 
     L.geoJSON(data, {
       pane: "isoline-fill",
       style: feature => ({
-        color: "#1e3a8a",
-        weight: 1.5,
-        opacity: 0.85,
+        color: "#0f1b12",
+        weight: 1.4,
+        opacity: 0.78,
         fillColor: colorByRange[feature.properties.range] || "#74c0fc",
         fillOpacity: 0.35
       }),
       onEachFeature: (feature, layer) => {
-        const r = feature.properties?.range;
-        if (r) {
-          layer.bindPopup(`Reachable within ${rangeLabel(r)}`);
-        }
+        const rMeters = feature.properties?.range;
+        const rMi = round1(metersToMiles(rMeters));
+
+        let tier = "";
+        if (rMi <= 15.5) tier = "0–15 miles: $0 (free)";
+        else if (rMi <= 20.5) tier = "15–20 miles: +$5 per visit";
+        else if (rMi <= 25.5) tier = "20–25 miles: +$10 per visit";
+        else if (rMi <= 30.5) tier = "25–30 miles: +$15 per visit";
+
+        const lines = [
+          `<strong>${originLabel}</strong>`,
+          `Within ~${rMi} driving miles`,
+          tier ? `<strong>${tier}</strong>` : ""
+        ].filter(Boolean);
+
+        layer.bindPopup(lines.join("<br>"));
 
         layer.on("mouseover", () =>
-          layer.setStyle({ weight: 2.5, fillOpacity: 0.45 })
+          layer.setStyle({ weight: 2.4, fillOpacity: 0.45 })
         );
         layer.on("mouseout", () =>
-          layer.setStyle({ weight: 1.5, fillOpacity: 0.35 })
+          layer.setStyle({ weight: 1.4, fillOpacity: 0.35 })
         );
       }
     }).addTo(map);
   }
 
+  renderSummary();
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      const rangesFound = [...new Set(
+        data.features
+          .map(f => f.properties?.range)
+          .filter(r => typeof r === "number")
+      )].sort((a, b) => a - b);
+
+      const colorByRange = {};
+      rangesFound.forEach((r, i) => {
+        colorByRange[r] = palette[Math.min(i, palette.length - 1)];
+      });
+
+      renderLegend(colorByRange);
+      drawIsolines(data, colorByRange);
+    })
+    .catch(() => {
+      document.getElementById("geo-summary").textContent =
+        "Could not load zones. Check your Geoapify API key and domain restrictions.";
+    });
 })();
 </script>
