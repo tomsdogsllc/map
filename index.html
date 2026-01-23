@@ -110,18 +110,22 @@
 
   const milesToMeters = mi => Math.round(mi * 1609.344);
 
-  // ONE zone: second-largest ring from [10,20,25,30] => 25 miles
-  const zoneMiles = 25;
+  // Drop radius by 5 miles: 25 -> 20
+  const zoneMiles = 17;
   const zoneMeters = milesToMeters(zoneMiles);
 
   const map = L.map("td-geo-map", { scrollWheelZoom: false })
-    .setView([origin.lat + 0.085, origin.lon], 11);
+    .setView([origin.lat + 0.070, origin.lon], 11);
 
   const isRetina = L.Browser.retina;
   const baseUrl = "https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}.png?apiKey={apiKey}";
-const retinaUrl = "https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}@2x.png?apiKey={apiKey}";
-
+  const retinaUrl = "https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}@2x.png?apiKey={apiKey}";
   L.tileLayer(isRetina ? retinaUrl : baseUrl, { maxZoom: 20, apiKey }).addTo(map);
+
+  // Panes
+  map.createPane("outside-dim");
+  map.getPane("outside-dim").style.zIndex = 410;
+  map.getPane("outside-dim").style.pointerEvents = "none";
 
   map.createPane("zone-fill");
   map.getPane("zone-fill").style.zIndex = 420;
@@ -129,6 +133,7 @@ const retinaUrl = "https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}@2x.pn
   map.createPane("markers-top");
   map.getPane("markers-top").style.zIndex = 650;
 
+  // Marker
   const originIcon = L.icon({
     iconUrl: `https://api.geoapify.com/v2/icon/?type=circle&color=%23315532&strokeColor=%230f1b12&size=44&icon=home&iconType=awesome&contentSize=24&noWhiteCircle&scaleFactor=2&apiKey=${apiKey}`,
     iconSize: [44, 44],
@@ -140,9 +145,33 @@ const retinaUrl = "https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}@2x.pn
     .addTo(map)
     .bindPopup(`Home Base: ${originName}`);
 
-  // Darker, more readable fill + soft outline
-  const zoneFill = "#315532";                  // brand green (deeper)
-  const zoneOutline = "rgba(49,85,50,0.48)";   // soft green outline
+  // Service area style: light green fill
+  const serviceFill = "rgba(94,124,96,0.30)";
+  const serviceOutline = "rgba(49,85,50,0.78)";
+
+  // Outside dim overlay
+  const outsideDimFill = "rgba(15,27,18,0.55)";
+
+  function firstRingFromFeature(feature){
+    const g = feature && feature.geometry;
+    if (!g) return null;
+
+    if (g.type === "Polygon" && Array.isArray(g.coordinates) && g.coordinates[0]) {
+      return g.coordinates[0];
+    }
+    if (g.type === "MultiPolygon" && Array.isArray(g.coordinates) && g.coordinates[0] && g.coordinates[0][0]) {
+      return g.coordinates[0][0];
+    }
+    return null;
+  }
+
+  function ensureClosed(ring){
+    if (!ring || ring.length < 3) return ring;
+    const first = ring[0];
+    const last = ring[ring.length - 1];
+    if (first && last && first[0] === last[0] && first[1] === last[1]) return ring;
+    return ring.concat([first]);
+  }
 
   function drawSingleZone(data){
     const zoneFeature = (data.features || []).find(
@@ -150,19 +179,52 @@ const retinaUrl = "https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}@2x.pn
     );
     if (!zoneFeature) return;
 
-    const baseStyle = { weight: 1.15, opacity: 0.92, fillOpacity: 0.46 };
-    const hoverStyle = { weight: 1.6, opacity: 0.98, fillOpacity: 0.56 };
+    const ring = ensureClosed(firstRingFromFeature(zoneFeature));
+    if (!ring) return;
+
+    // Dim everything outside the service area (world polygon with a hole)
+    const worldOuter = [
+      [-180, -90],
+      [ 180, -90],
+      [ 180,  90],
+      [-180,  90],
+      [-180, -90]
+    ];
+
+    const innerHole = ring.slice().reverse();
+
+    const maskFeature = {
+      type: "Feature",
+      properties: {},
+      geometry: { type: "Polygon", coordinates: [worldOuter, innerHole] }
+    };
+
+    L.geoJSON(maskFeature, {
+      pane: "outside-dim",
+      interactive: false,
+      style: () => ({
+        color: "transparent",
+        weight: 0,
+        opacity: 0,
+        fillColor: outsideDimFill,
+        fillOpacity: 1
+      })
+    }).addTo(map);
+
+    // Draw the service area itself
+    const baseStyle = { weight: 1.35, opacity: 0.95, fillOpacity: 0.30 };
+    const hoverStyle = { weight: 1.85, opacity: 0.98, fillOpacity: 0.38 };
 
     const layer = L.geoJSON(zoneFeature, {
       pane: "zone-fill",
       style: () => ({
-        color: zoneOutline,
+        color: serviceOutline,
         weight: baseStyle.weight,
         opacity: baseStyle.opacity,
         lineJoin: "round",
         lineCap: "round",
         dashArray: "2 6",
-        fillColor: zoneFill,
+        fillColor: serviceFill,
         fillOpacity: baseStyle.fillOpacity
       })
     }).addTo(map);
@@ -173,8 +235,7 @@ const retinaUrl = "https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}@2x.pn
     // Fit around zone + origin
     try{
       const b = layer.getBounds();
-      const originLatLng = L.latLng(origin.lat, origin.lon);
-      map.fitBounds(b.extend(originLatLng).pad(0.13));
+      map.fitBounds(b.extend([origin.lat, origin.lon]).pad(0.13));
     } catch(e){}
   }
 
