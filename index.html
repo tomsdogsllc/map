@@ -110,7 +110,7 @@
 
   const milesToMeters = mi => Math.round(mi * 1609.344);
 
-  // We ONLY want the second-largest ring from [10,20,25,30] => 25 miles
+  // ONE zone: second-largest ring from [10,20,25,30] => 25 miles
   const zoneMiles = 25;
   const zoneMeters = milesToMeters(zoneMiles);
 
@@ -140,41 +140,37 @@
     .addTo(map)
     .bindPopup(`Home Base: ${originName}`);
 
-  // Single-zone styling (green fill + SOFT outline)
-  const zoneFill = "#5ea97f";                  // brand-friendly mid green
-  const zoneOutline = "rgba(49,85,50,0.38)";   // soft green outline (not black)
+  // Darker, more readable fill + soft outline
+  const zoneFill = "#315532";                  // brand green (deeper)
+  const zoneOutline = "rgba(49,85,50,0.48)";   // soft green outline
 
   function drawSingleZone(data){
-    // Only keep the feature that matches our desired range (25 miles)
     const zoneFeature = (data.features || []).find(
       f => typeof f?.properties?.range === "number" && f.properties.range === zoneMeters
     );
-
     if (!zoneFeature) return;
+
+    const baseStyle = { weight: 1.15, opacity: 0.92, fillOpacity: 0.46 };
+    const hoverStyle = { weight: 1.6, opacity: 0.98, fillOpacity: 0.56 };
 
     const layer = L.geoJSON(zoneFeature, {
       pane: "zone-fill",
       style: () => ({
-        color: zoneOutline,        // soft outline
-        weight: 1.15,              // thin
-        opacity: 0.95,             // readable but not harsh
+        color: zoneOutline,
+        weight: baseStyle.weight,
+        opacity: baseStyle.opacity,
         lineJoin: "round",
         lineCap: "round",
-        dashArray: "2 6",          // subtle dotted feel
+        dashArray: "2 6",
         fillColor: zoneFill,
-        fillOpacity: 0.38          // calm, premium fill
+        fillOpacity: baseStyle.fillOpacity
       })
     }).addTo(map);
 
-    // Optional hover: slightly stronger but still soft
-    layer.on("mouseover", () => {
-      layer.setStyle({ weight: 1.6, opacity: 0.95, fillOpacity: 0.24 });
-    });
-    layer.on("mouseout", () => {
-      layer.setStyle({ weight: 1.15, opacity: 0.85, fillOpacity: 0.18 });
-    });
+    layer.on("mouseover", () => layer.setStyle(hoverStyle));
+    layer.on("mouseout", () => layer.setStyle(baseStyle));
 
-    // Fit map gently around the zone + origin so it "reads" instantly
+    // Fit around zone + origin
     try{
       const b = layer.getBounds();
       const originLatLng = L.latLng(origin.lat, origin.lon);
