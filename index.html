@@ -4,6 +4,7 @@
   integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
   crossorigin=""
 />
+
 <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800,900&display=swap" rel="stylesheet">
 
 <style>
@@ -15,98 +16,68 @@
     --td-sage:#5E7C60;
     --td-accent:#D9772A;
 
-    --td-ink: rgba(15,27,18,0.92);
-    --td-ink-2: rgba(15,27,18,0.70);
-    --td-border: rgba(49,85,50,0.20);
+    --td-border: rgba(49,85,50,0.22);
     --td-shadow: 0 18px 40px rgba(15,27,18,0.16);
+
     --td-radius: 18px;
   }
 
-  html, body{ height:100%; margin:0; background:transparent; font-family:"Nunito",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+  html, body{
+    height:100%;
+    margin:0;
+    background: transparent;
+    font-family: "Nunito", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  }
 
-  .td-footer-map{
-    position: relative;
-    height: 360px;         /* footer-friendly */
+  /* Full-width container */
+  .td-geo-app{
+    height: 520px;
+    padding: 14px;
     border-radius: var(--td-radius);
-    overflow: hidden;
+    overflow:hidden;
+    background:
+      radial-gradient(1100px 740px at 16% -10%, rgba(94,124,96,0.18), transparent 60%),
+      radial-gradient(900px 650px at 92% 0%, rgba(217,119,42,0.12), transparent 65%),
+      rgba(247,244,237,0.55);
+    border: 1px solid var(--td-border);
+  }
+
+  @media (max-width: 860px){
+    .td-geo-app{
+      height: 380px;
+      padding: 10px;
+    }
+  }
+
+  #td-geo-map{
+    height:100%;
+    width:100%;
+    border-radius: var(--td-radius);
     border: 1px solid var(--td-border);
     box-shadow: var(--td-shadow);
-    background: rgba(247,244,237,0.55);
+    overflow:hidden;
+    background:#fff;
   }
 
-  #td-map{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-  }
-
-  /* Overlay card */
-  .td-card{
-    position:absolute;
-    left: 14px;
-    bottom: 14px;
-    width: min(340px, calc(100% - 28px));
-    padding: 12px 12px;
-    border-radius: 16px;
-    border: 1px solid rgba(49,85,50,0.18);
-    background: linear-gradient(180deg, rgba(255,246,229,0.90), rgba(247,244,237,0.82));
-    box-shadow: 0 14px 28px rgba(15,27,18,0.16);
-    color: var(--td-ink);
-    backdrop-filter: blur(6px);
-  }
-
-  .td-title{
-    margin: 0 0 8px;
-    font-size: 12px;
-    letter-spacing: 0.10em;
-    text-transform: uppercase;
-    font-weight: 900;
-  }
-
-  .td-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap: 10px;
-    padding: 7px 8px;
-    border-radius: 12px;
-    border: 1px solid rgba(49,85,50,0.14);
-    background: rgba(247,244,237,0.85);
-    margin: 6px 0;
-    font-size: 13px;
-  }
-
-  .td-row strong{
-    color: var(--td-green);
-    font-weight: 900;
-    white-space: nowrap;
-  }
-
-  .td-note{
-    margin-top: 8px;
-    font-size: 12px;
-    color: var(--td-ink-2);
-    line-height: 1.35;
-  }
-
-  /* Leaflet polish */
   .leaflet-control-zoom,
   .leaflet-control-attribution{
     border-radius: 14px !important;
     overflow:hidden;
   }
+
   .leaflet-control-zoom a{
     background: rgba(247,244,237,0.92) !important;
     color: rgba(15,27,18,0.88) !important;
     border:0 !important;
   }
+
   .leaflet-control-attribution{
     background: rgba(247,244,237,0.82) !important;
     color: rgba(15,27,18,0.70) !important;
     border: 1px solid rgba(49,85,50,0.14) !important;
     box-shadow: 0 10px 20px rgba(15,27,18,0.10);
   }
+
   .leaflet-popup-content-wrapper{
     border-radius: 16px !important;
     border: 1px solid rgba(49,85,50,0.18);
@@ -114,23 +85,15 @@
     color: rgba(15,27,18,0.92);
     box-shadow: 0 18px 34px rgba(15,27,18,0.18);
   }
+
   .leaflet-popup-tip{
     background: rgba(255,246,229,0.96) !important;
     border: 1px solid rgba(49,85,50,0.14);
   }
 </style>
 
-<div class="td-footer-map">
-  <div id="td-map"></div>
-
-  <div class="td-card" aria-label="Travel fee tiers">
-    <div class="td-title">Travel Fee (per visit)</div>
-    <div class="td-row"><span>0–10 miles</span><strong>$0</strong></div>
-    <div class="td-row"><span>10–20 miles</span><strong>+ $5</strong></div>
-    <div class="td-row"><span>20–25 miles</span><strong>+ $10</strong></div>
-    <div class="td-row"><span>25–30 miles</span><strong>+ $15</strong></div>
-    <div class="td-note">30+ miles: custom quote.</div>
-  </div>
+<div class="td-geo-app">
+  <div id="td-geo-map"></div>
 </div>
 
 <script
@@ -143,14 +106,16 @@
 (() => {
   const apiKey = "f82ea38cb77543d59c597faaa263e714";
 
-  // Toby May Park (Home Base)
+  const originName = "Toby May Park";
   const origin = { lat: 41.3274358, lon: -72.1034902 };
 
-  const map = L.map("td-map", {
-    scrollWheelZoom: false,
-    dragging: true,
-    tap: true
-  }).setView([origin.lat, origin.lon], 10);
+  const milesToMeters = mi => Math.round(mi * 1609.344);
+
+  const bandsMiles = [10, 20, 25, 30];
+  const rangesMeters = bandsMiles.map(milesToMeters);
+
+  const map = L.map("td-geo-map", { scrollWheelZoom: false })
+    .setView([origin.lat, origin.lon], 11);
 
   const isRetina = L.Browser.retina;
   const baseUrl = "https://maps.geoapify.com/v1/tile/osm-bright-grey/{z}/{x}/{y}.png?apiKey={apiKey}";
@@ -160,6 +125,7 @@
 
   map.createPane("isoline-fill");
   map.getPane("isoline-fill").style.zIndex = 400;
+
   map.createPane("markers-top");
   map.getPane("markers-top").style.zIndex = 650;
 
@@ -172,49 +138,36 @@
 
   L.marker([origin.lat, origin.lon], { icon: originIcon, pane: "markers-top" })
     .addTo(map)
-    .bindPopup("Home Base: Toby May Park");
+    .bindPopup(`Home Base: ${originName}`);
 
-  const milesToMeters = mi => Math.round(mi * 1609.344);
-  const rangesMeters = [10, 20, 25, 30].map(milesToMeters);
+  const palette = ["#fff3bf", "#b2f2bb", "#a5d8ff", "#d0bfff", "#ffc9c9", "#ffd8a8"];
+
+  function drawIsolines(data){
+    data.features.sort((a, b) => b.properties.range - a.properties.range);
+
+    L.geoJSON(data, {
+      pane: "isoline-fill",
+      style: feature => ({
+        color: "#0f1b12",
+        weight: 1.3,
+        opacity: 0.78,
+        fillColor: palette[bandsMiles.indexOf(feature.properties.range / 1609.344)] || "#74c0fc",
+        fillOpacity: 0.34
+      }),
+      onEachFeature: (feature, layer) => {
+        layer.on("mouseover", () => layer.setStyle({ weight: 2.2, fillOpacity: 0.44 }));
+        layer.on("mouseout", () => layer.setStyle({ weight: 1.3, fillOpacity: 0.34 }));
+      }
+    }).addTo(map);
+  }
 
   const isolineUrl =
     `https://api.geoapify.com/v1/isoline?lat=${origin.lat}&lon=${origin.lon}` +
     `&type=distance&mode=drive&range=${rangesMeters.join(",")}&apiKey=${apiKey}`;
 
-  const palette = ["#fff3bf","#b2f2bb","#a5d8ff","#d0bfff","#ffc9c9","#ffd8a8"];
-
   fetch(isolineUrl)
-    .then(r => r.json())
-    .then(data => {
-      const rangesFound = [...new Set(
-        data.features.map(f => f.properties?.range).filter(x => typeof x === "number")
-      )].sort((a,b)=>a-b);
-
-      const colorByRange = {};
-      rangesFound.forEach((rng, i) => colorByRange[rng] = palette[Math.min(i, palette.length - 1)]);
-
-      data.features.sort((a,b)=>b.properties.range-a.properties.range);
-
-      L.geoJSON(data, {
-        pane: "isoline-fill",
-        style: f => ({
-          color: "#0f1b12",
-          weight: 1.2,
-          opacity: 0.72,
-          fillColor: colorByRange[f.properties.range] || "#74c0fc",
-          fillOpacity: 0.28
-        }),
-        onEachFeature: (feature, layer) => {
-          const r = feature.properties?.range;
-          if (typeof r === "number"){
-            const mi = Math.round((r/1609.344) * 10) / 10;
-            layer.bindPopup(`Zone boundary: ~${mi} miles`);
-          }
-        }
-      }).addTo(map);
-    })
-    .catch(() => {
-      // Silent fail for footer: map still works without zones
-    });
+    .then(res => res.json())
+    .then(drawIsolines)
+    .catch(() => {});
 })();
 </script>
