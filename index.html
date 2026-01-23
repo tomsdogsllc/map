@@ -29,7 +29,6 @@
     font-family: "Nunito", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   }
 
-  /* Full-width container */
   .td-geo-app{
     height: 520px;
     padding: 14px;
@@ -111,11 +110,12 @@
 
   const milesToMeters = mi => Math.round(mi * 1609.344);
 
-  const bandsMiles = [10, 20, 25, 30];
-  const rangesMeters = bandsMiles.map(milesToMeters);
+  // We ONLY want the second-largest ring from [10,20,25,30] => 25 miles
+  const zoneMiles = 25;
+  const zoneMeters = milesToMeters(zoneMiles);
 
   const map = L.map("td-geo-map", { scrollWheelZoom: false })
-    .setView([origin.lat, origin.lon], 11);
+    .setView([origin.lat + 0.085, origin.lon], 11);
 
   const isRetina = L.Browser.retina;
   const baseUrl = "https://maps.geoapify.com/v1/tile/osm-bright-grey/{z}/{x}/{y}.png?apiKey={apiKey}";
@@ -123,8 +123,8 @@
 
   L.tileLayer(isRetina ? retinaUrl : baseUrl, { maxZoom: 20, apiKey }).addTo(map);
 
-  map.createPane("isoline-fill");
-  map.getPane("isoline-fill").style.zIndex = 400;
+  map.createPane("zone-fill");
+  map.getPane("zone-fill").style.zIndex = 420;
 
   map.createPane("markers-top");
   map.getPane("markers-top").style.zIndex = 650;
@@ -140,34 +140,55 @@
     .addTo(map)
     .bindPopup(`Home Base: ${originName}`);
 
-  const palette = ["#fff3bf", "#b2f2bb", "#a5d8ff", "#d0bfff", "#ffc9c9", "#ffd8a8"];
+  // Single-zone styling (green fill + SOFT outline)
+  const zoneFill = "#5ea97f";                  // brand-friendly mid green
+  const zoneOutline = "rgba(49,85,50,0.38)";   // soft green outline (not black)
 
-  function drawIsolines(data){
-    data.features.sort((a, b) => b.properties.range - a.properties.range);
+  function drawSingleZone(data){
+    // Only keep the feature that matches our desired range (25 miles)
+    const zoneFeature = (data.features || []).find(
+      f => typeof f?.properties?.range === "number" && f.properties.range === zoneMeters
+    );
 
-    L.geoJSON(data, {
-      pane: "isoline-fill",
-      style: feature => ({
-        color: "#0f1b12",
-        weight: 1.3,
-        opacity: 0.78,
-        fillColor: palette[bandsMiles.indexOf(feature.properties.range / 1609.344)] || "#74c0fc",
-        fillOpacity: 0.34
-      }),
-      onEachFeature: (feature, layer) => {
-        layer.on("mouseover", () => layer.setStyle({ weight: 2.2, fillOpacity: 0.44 }));
-        layer.on("mouseout", () => layer.setStyle({ weight: 1.3, fillOpacity: 0.34 }));
-      }
+    if (!zoneFeature) return;
+
+    const layer = L.geoJSON(zoneFeature, {
+      pane: "zone-fill",
+      style: () => ({
+        color: zoneOutline,        // soft outline
+        weight: 1.15,              // thin
+        opacity: 0.85,             // readable but not harsh
+        lineJoin: "round",
+        lineCap: "round",
+        dashArray: "2 6",          // subtle dotted feel
+        fillColor: zoneFill,
+        fillOpacity: 0.38          // calm, premium fill
+      })
     }).addTo(map);
+
+    // Optional hover: slightly stronger but still soft
+    layer.on("mouseover", () => {
+      layer.setStyle({ weight: 1.6, opacity: 0.95, fillOpacity: 0.24 });
+    });
+    layer.on("mouseout", () => {
+      layer.setStyle({ weight: 1.15, opacity: 0.85, fillOpacity: 0.18 });
+    });
+
+    // Fit map gently around the zone + origin so it "reads" instantly
+    try{
+      const b = layer.getBounds();
+      const originLatLng = L.latLng(origin.lat, origin.lon);
+      map.fitBounds(b.extend(originLatLng).pad(0.18));
+    } catch(e){}
   }
 
   const isolineUrl =
     `https://api.geoapify.com/v1/isoline?lat=${origin.lat}&lon=${origin.lon}` +
-    `&type=distance&mode=drive&range=${rangesMeters.join(",")}&apiKey=${apiKey}`;
+    `&type=distance&mode=drive&range=${zoneMeters}&apiKey=${apiKey}`;
 
   fetch(isolineUrl)
     .then(res => res.json())
-    .then(drawIsolines)
+    .then(drawSingleZone)
     .catch(() => {});
 })();
 </script>
