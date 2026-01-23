@@ -1,9 +1,3 @@
-<!-- =========================
- Tom's Dogs Travel Fee Map (Client-facing footer embed)
- Origin: Toby May Park, New London, CT
- Zones by driving distance + address-based exact quote
- ========================= -->
-
 <link
   rel="stylesheet"
   href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -21,62 +15,61 @@
     --td-accent:#D9772A;
 
     --td-ink: rgba(15,27,18,0.92);
-    --td-border: rgba(49,85,50,0.20);
-    --td-shadow: 0 16px 38px rgba(15,27,18,0.18);
-    --td-shadow-soft: 0 12px 28px rgba(15,27,18,0.12);
+    --td-border: rgba(49,85,50,0.18);
+    --td-shadow: 0 14px 30px rgba(15,27,18,0.16);
+    --td-shadow-soft: 0 10px 22px rgba(15,27,18,0.10);
 
-    --td-radius: 18px;
-    --td-radius-sm: 14px;
+    --td-radius: 16px;
+    --td-radius-sm: 12px;
   }
 
-  html, body { height: 100%; margin: 0; background:#fff; }
+  html, body{ height:100%; margin:0; background:#fff; }
 
-  /* Footer-friendly container */
+  /* tighter footprint for footer */
   .td-geo-app{
-    height: 560px;
-    display: grid;
-    grid-template-columns: 380px 1fr;
-    gap: 12px;
-    padding: 12px;
+    height: 500px;
+    display:grid;
+    grid-template-columns: 340px 1fr;
+    gap: 10px;
+    padding: 10px;
     box-sizing: border-box;
 
     border-radius: var(--td-radius);
-    overflow: hidden;
+    overflow:hidden;
     border: 1px solid var(--td-border);
 
     background:
-      radial-gradient(1200px 800px at 18% -10%, rgba(94,124,96,0.18), transparent 60%),
-      radial-gradient(900px 650px at 92% 0%, rgba(217,119,42,0.10), transparent 65%),
+      radial-gradient(1000px 650px at 18% -10%, rgba(94,124,96,0.16), transparent 60%),
+      radial-gradient(760px 560px at 92% 0%, rgba(217,119,42,0.10), transparent 65%),
       #fff;
   }
 
   @media (max-width: 860px){
     .td-geo-app{
       grid-template-columns: 1fr;
-      grid-template-rows: auto 420px;
-      height: auto;
+      grid-template-rows: auto 360px;
+      height:auto;
       padding: 10px;
     }
   }
 
-  /* Sidebar card */
   #td-geo-sidebar{
-    padding: 14px;
-    border: 1px solid rgba(49,85,50,0.18);
+    padding: 12px;
+    border: 1px solid rgba(49,85,50,0.16);
     border-radius: var(--td-radius);
-    overflow: auto;
+    overflow:auto;
 
     font-family: "Nunito", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    font-size: 14px;
-    line-height: 1.45;
+    font-size: 13.5px;
+    line-height: 1.42;
 
-    background: linear-gradient(180deg, rgba(255,246,229,0.82), rgba(94,124,96,0.10));
+    background: linear-gradient(180deg, rgba(255,246,229,0.80), rgba(94,124,96,0.10));
     box-shadow: var(--td-shadow-soft);
   }
 
   #td-geo-sidebar h2{
-    margin: 0 0 8px;
-    font-size: 15px;
+    margin: 0 0 6px;
+    font-size: 14px;
     letter-spacing: 0.03em;
     text-transform: uppercase;
     font-weight: 900;
@@ -84,117 +77,113 @@
   }
 
   .td-sub{
-    color: rgba(15,27,18,0.76);
-    font-size: 13px;
-    margin-bottom: 12px;
+    color: rgba(15,27,18,0.74);
+    font-size: 12.5px;
+    margin-bottom: 10px;
   }
 
   .td-panel{
-    margin-top: 10px;
-    padding: 12px;
-    border-radius: 14px;
-    border: 1px solid rgba(49,85,50,0.16);
+    margin-top: 8px;
+    padding: 10px;
+    border-radius: var(--td-radius-sm);
+    border: 1px solid rgba(49,85,50,0.14);
     background: rgba(247,244,237,0.78);
-    box-shadow: 0 10px 22px rgba(15,27,18,0.08);
+    box-shadow: 0 8px 18px rgba(15,27,18,0.08);
   }
 
   .td-panel-title{
     font-weight: 900;
-    font-size: 12px;
+    font-size: 11.5px;
     letter-spacing: 0.02em;
     margin-bottom: 8px;
-    color: rgba(15,27,18,0.90);
+    color: rgba(15,27,18,0.88);
     text-transform: uppercase;
   }
 
-  /* Quote tool */
   .td-quote-row{
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    align-items: center;
+    display:flex;
+    gap: 8px;
+    flex-wrap:wrap;
+    align-items:center;
   }
 
   .td-input{
-    flex: 1;
-    min-width: 220px;
-    padding: 12px 12px;
-    border-radius: 14px;
-    border: 1px solid rgba(49,85,50,0.18);
+    flex:1;
+    min-width: 210px;
+    padding: 10px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(49,85,50,0.16);
     background: rgba(247,244,237,0.92);
     color: rgba(15,27,18,0.92);
-    outline: none;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+    outline:none;
   }
   .td-input:focus{
     border-color: rgba(217,119,42,0.55);
-    box-shadow: 0 0 0 4px rgba(217,119,42,0.16);
+    box-shadow: 0 0 0 4px rgba(217,119,42,0.14);
   }
 
   .td-btn{
-    padding: 12px 12px;
-    border-radius: 14px;
+    padding: 10px 10px;
+    border-radius: 12px;
     border: 1px solid rgba(255,246,229,0.18);
     background: linear-gradient(180deg, rgba(49,85,50,1), rgba(37,63,38,1));
     color: var(--td-cream);
     font-weight: 900;
     letter-spacing: 0.03em;
     text-transform: uppercase;
-    cursor: pointer;
-    box-shadow: 0 10px 18px rgba(15,27,18,0.18);
+    cursor:pointer;
+    box-shadow: 0 10px 16px rgba(15,27,18,0.16);
   }
-  .td-btn:hover{ transform: translateY(-1px); }
 
   .td-btn-secondary{
-    padding: 12px 12px;
-    border-radius: 14px;
-    border: 1px solid rgba(49,85,50,0.18);
-    background: rgba(255,246,229,0.74);
+    padding: 10px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(49,85,50,0.16);
+    background: rgba(255,246,229,0.76);
     color: var(--td-green);
     font-weight: 900;
     letter-spacing: 0.03em;
     text-transform: uppercase;
-    cursor: pointer;
+    cursor:pointer;
   }
 
   .td-result{
-    margin-top: 10px;
-    padding: 10px 12px;
-    border-radius: 14px;
-    border: 1px solid rgba(49,85,50,0.16);
+    margin-top: 8px;
+    padding: 9px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(49,85,50,0.14);
     background: rgba(94,124,96,0.10);
     color: rgba(15,27,18,0.92);
   }
 
-  /* Legend */
   .td-legend-title{
     font-weight: 900;
     letter-spacing: 0.02em;
-    margin: 10px 0 10px;
-    color: rgba(15,27,18,0.90);
+    margin: 10px 0 8px;
+    color: rgba(15,27,18,0.88);
     text-transform: uppercase;
-    font-size: 12px;
+    font-size: 11.5px;
   }
 
   .td-legend-item{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 8px;
 
-    margin: 10px 0;
-    padding: 10px 10px;
-    border-radius: 14px;
+    margin: 8px 0;
+    padding: 8px 9px;
+    border-radius: 12px;
 
-    border: 1px solid rgba(49,85,50,0.16);
+    border: 1px solid rgba(49,85,50,0.14);
     background: rgba(247,244,237,0.78);
-    box-shadow: 0 10px 20px rgba(15,27,18,0.08);
+    box-shadow: 0 8px 18px rgba(15,27,18,0.08);
   }
 
   .td-legend-item .left{
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
+    display:inline-flex;
+    align-items:center;
+    gap: 8px;
   }
 
   .td-legend-item strong{
@@ -204,56 +193,52 @@
   }
 
   .td-swatch{
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     border-radius: 6px;
     border: 1px solid rgba(15,27,18,0.18);
     box-shadow: inset 0 0 0 1px rgba(255,255,255,0.55);
   }
 
   .td-note{
-    margin-top: 10px;
+    margin-top: 8px;
     font-size: 12px;
-    color: rgba(15,27,18,0.72);
+    color: rgba(15,27,18,0.70);
   }
 
-  /* Map container */
   #td-geo-map{
-    height: 100%;
-    width: 100%;
+    height:100%;
+    width:100%;
     border-radius: var(--td-radius);
-    border: 1px solid rgba(49,85,50,0.20);
+    border: 1px solid rgba(49,85,50,0.18);
     box-shadow: var(--td-shadow);
-    overflow: hidden;
-    background: #fff;
+    overflow:hidden;
+    background:#fff;
   }
 
   /* Leaflet polish */
   .leaflet-control-zoom,
   .leaflet-control-attribution{
-    border-radius: 14px !important;
-    overflow: hidden;
+    border-radius: 12px !important;
+    overflow:hidden;
   }
   .leaflet-control-zoom a{
     background: rgba(247,244,237,0.92) !important;
     color: rgba(15,27,18,0.88) !important;
-    border: 0 !important;
-  }
-  .leaflet-control-zoom a:hover{
-    background: rgba(255,246,229,0.98) !important;
+    border:0 !important;
   }
   .leaflet-control-attribution{
     background: rgba(247,244,237,0.82) !important;
     color: rgba(15,27,18,0.70) !important;
     border: 1px solid rgba(49,85,50,0.14) !important;
-    box-shadow: 0 10px 20px rgba(15,27,18,0.10);
+    box-shadow: 0 10px 18px rgba(15,27,18,0.10);
   }
   .leaflet-popup-content-wrapper{
-    border-radius: 16px !important;
+    border-radius: 14px !important;
     border: 1px solid rgba(49,85,50,0.18);
     background: rgba(255,246,229,0.96) !important;
     color: rgba(15,27,18,0.92);
-    box-shadow: 0 18px 34px rgba(15,27,18,0.18);
+    box-shadow: 0 16px 30px rgba(15,27,18,0.16);
   }
   .leaflet-popup-tip{
     background: rgba(255,246,229,0.96) !important;
@@ -264,7 +249,7 @@
 <div class="td-geo-app">
   <aside id="td-geo-sidebar">
     <h2>Travel Fee Zones</h2>
-    <div class="td-sub">Check the per-visit travel fee from our home base in New London, CT.</div>
+    <div class="td-sub">Check the per-visit travel fee based on driving distance from New London, CT.</div>
 
     <div class="td-panel">
       <div class="td-panel-title">Check your travel fee</div>
@@ -273,7 +258,7 @@
         <button id="td-quote-btn" class="td-btn" type="button">Check</button>
         <button id="td-clear-btn" class="td-btn-secondary" type="button">Clear</button>
       </div>
-      <div id="td-result" class="td-result">Enter an address to get an exact quote based on driving miles.</div>
+      <div id="td-result" class="td-result">Enter an address to calculate your travel fee.</div>
     </div>
 
     <div class="td-panel">
@@ -283,9 +268,7 @@
 
     <div id="td-legend"></div>
 
-    <div class="td-note">
-      Note: Quotes use typical driving routes. For locations beyond 30 miles, we will confirm a custom quote.
-    </div>
+    <div class="td-note">30+ miles: custom quote.</div>
   </aside>
 
   <div id="td-geo-map"></div>
@@ -305,13 +288,13 @@
   const originName = "Toby May Park";
   const origin = { lat: 41.3274358, lon: -72.1034902 };
 
-  // Fee tiers
+  // Fee policy (0–10 free)
   function feePolicy(miles){
-    if (miles <= 15) return { tier: "0–15 miles", fee: 0, note: "Free travel within 15 miles." };
-    if (miles <= 20) return { tier: "15–20 miles", fee: 5, note: "+$5 per visit." };
-    if (miles <= 25) return { tier: "20–25 miles", fee: 10, note: "+$10 per visit." };
-    if (miles <= 30) return { tier: "25–30 miles", fee: 15, note: "+$15 per visit." };
-    return { tier: "30+ miles", fee: null, note: "Custom quote." };
+    if (miles <= 10) return { tier: "0–10 miles", fee: 0 };
+    if (miles <= 20) return { tier: "10–20 miles", fee: 5 };
+    if (miles <= 25) return { tier: "20–25 miles", fee: 10 };
+    if (miles <= 30) return { tier: "25–30 miles", fee: 15 };
+    return { tier: "30+ miles", fee: null };
   }
 
   const money = n => (typeof n === "number" ? `$${n}` : "Custom quote");
@@ -319,19 +302,17 @@
   const metersToMiles = m => m / 1609.344;
   const round1 = n => Math.round(n * 10) / 10;
 
-  // Zone bands for map
-  const bandsMiles = [15, 20, 25, 30];
+  // Bands to match tiers (10,20,25,30)
+  const bandsMiles = [10, 20, 25, 30];
   const rangesMeters = bandsMiles.map(milesToMeters);
 
-  // Client-facing legend rows
   const legendRows = [
-    { label: "0–15 miles", fee: "$0" },
-    { label: "15–20 miles", fee: "+$5" },
+    { label: "0–10 miles", fee: "$0" },
+    { label: "10–20 miles", fee: "+$5" },
     { label: "20–25 miles", fee: "+$10" },
     { label: "25–30 miles", fee: "+$15" }
   ];
 
-  // Build map (disable scroll wheel in footer)
   const map = L.map("td-geo-map", { scrollWheelZoom: false }).setView([origin.lat, origin.lon], 11);
 
   const isRetina = L.Browser.retina;
@@ -340,15 +321,11 @@
 
   L.tileLayer(isRetina ? retinaUrl : baseUrl, { maxZoom: 20, apiKey }).addTo(map);
 
-  // Panes
   map.createPane("isoline-fill");
   map.getPane("isoline-fill").style.zIndex = 400;
   map.createPane("markers-top");
   map.getPane("markers-top").style.zIndex = 650;
-  map.createPane("route-line");
-  map.getPane("route-line").style.zIndex = 700;
 
-  // Origin marker
   const originIcon = L.icon({
     iconUrl: `https://api.geoapify.com/v2/icon/?type=circle&color=%23315532&strokeColor=%230f1b12&size=44&icon=home&iconType=awesome&contentSize=24&noWhiteCircle&scaleFactor=2&apiKey=${apiKey}`,
     iconSize: [44, 44],
@@ -360,7 +337,6 @@
     .addTo(map)
     .bindPopup(`Home Base: ${originName}`);
 
-  // Render legend after isolines load
   const palette = ["#fff3bf", "#b2f2bb", "#a5d8ff", "#d0bfff", "#ffc9c9", "#ffd8a8"];
 
   function renderLegend(colorByRange){
@@ -382,12 +358,6 @@
       `;
       legend.appendChild(item);
     });
-
-    const extra = document.createElement("div");
-    extra.className = "td-note";
-    extra.style.marginTop = "8px";
-    extra.textContent = "30+ miles: custom quote.";
-    legend.appendChild(extra);
   }
 
   function drawIsolines(data, colorByRange){
@@ -397,29 +367,28 @@
       pane: "isoline-fill",
       style: feature => ({
         color: "#0f1b12",
-        weight: 1.4,
+        weight: 1.3,
         opacity: 0.78,
         fillColor: colorByRange[feature.properties.range] || "#74c0fc",
-        fillOpacity: 0.35
+        fillOpacity: 0.34
       }),
       onEachFeature: (feature, layer) => {
         const rMeters = feature.properties?.range;
 
         let tier = "";
-        if (rMeters === milesToMeters(15)) tier = "0–15 miles: $0";
-        else if (rMeters === milesToMeters(20)) tier = "15–20 miles: +$5";
+        if (rMeters === milesToMeters(10)) tier = "0–10 miles: $0";
+        else if (rMeters === milesToMeters(20)) tier = "10–20 miles: +$5";
         else if (rMeters === milesToMeters(25)) tier = "20–25 miles: +$10";
         else if (rMeters === milesToMeters(30)) tier = "25–30 miles: +$15";
 
         if (tier) layer.bindPopup(`<strong>Travel Fee Zone</strong><br><strong>${tier}</strong>`);
 
-        layer.on("mouseover", () => layer.setStyle({ weight: 2.4, fillOpacity: 0.45 }));
-        layer.on("mouseout", () => layer.setStyle({ weight: 1.4, fillOpacity: 0.35 }));
+        layer.on("mouseover", () => layer.setStyle({ weight: 2.2, fillOpacity: 0.44 }));
+        layer.on("mouseout", () => layer.setStyle({ weight: 1.3, fillOpacity: 0.34 }));
       }
     }).addTo(map);
   }
 
-  // Isoline request (distance)
   const isolineUrl =
     `https://api.geoapify.com/v1/isoline?lat=${origin.lat}&lon=${origin.lon}` +
     `&type=distance&mode=drive&range=${rangesMeters.join(",")}&apiKey=${apiKey}`;
@@ -428,9 +397,7 @@
     .then(res => res.json())
     .then(data => {
       const rangesFound = [...new Set(
-        data.features
-          .map(f => f.properties?.range)
-          .filter(r => typeof r === "number")
+        data.features.map(f => f.properties?.range).filter(r => typeof r === "number")
       )].sort((a, b) => a - b);
 
       const colorByRange = {};
@@ -442,25 +409,23 @@
     .catch(() => {
       const legend = document.getElementById("td-legend");
       legend.innerHTML = `<div class="td-legend-title">Per-visit travel fee</div>
-        <div class="td-note">Map temporarily unavailable. Please enter your address above or contact us to confirm your travel fee.</div>`;
+        <div class="td-note">Map temporarily unavailable. Please enter your address above to check your travel fee.</div>`;
     });
 
-  // Address quoting (geocode + routing)
+  // Quote tool (geocode + routing) - NO ROUTE LINE DRAWN (cleaner for clients)
   const addressEl = document.getElementById("td-address");
   const quoteBtn = document.getElementById("td-quote-btn");
   const clearBtn = document.getElementById("td-clear-btn");
   const resultEl = document.getElementById("td-result");
 
   let clientMarker = null;
-  let routeLine = null;
 
   function setResult(html){ resultEl.innerHTML = html; }
 
   function clearQuote(){
     if (clientMarker) { map.removeLayer(clientMarker); clientMarker = null; }
-    if (routeLine) { map.removeLayer(routeLine); routeLine = null; }
     addressEl.value = "";
-    setResult("Enter an address to get an exact quote based on driving miles.");
+    setResult("Enter an address to calculate your travel fee.");
   }
 
   function geocodeAddress(text){
@@ -473,11 +438,7 @@
         const coords = feat.geometry?.coordinates; // [lon, lat]
         const props = feat.properties || {};
         if (!coords || coords.length < 2) return null;
-        return {
-          lat: coords[1],
-          lon: coords[0],
-          label: props.formatted || text
-        };
+        return { lat: coords[1], lon: coords[0], label: props.formatted || text };
       });
   }
 
@@ -489,9 +450,8 @@
       .then(data => {
         const feat = data?.features?.[0];
         const distM = feat?.properties?.distance; // meters
-        const geom = feat?.geometry; // LineString
         if (typeof distM !== "number") return null;
-        return { distanceMeters: distM, geometry: geom };
+        return { distanceMeters: distM };
       });
   }
 
@@ -502,50 +462,37 @@
       return;
     }
 
-    setResult("Calculating travel fee...");
+    setResult("Calculating...");
 
     const place = await geocodeAddress(text);
     if (!place){
-      setResult("<strong>We could not find that address.</strong><br>Please include the town and state (ex: Old Lyme, CT).");
+      setResult("<strong>We could not find that address.</strong><br>Please include the town and state.");
       return;
     }
 
     const route = await routeDistance(origin, place);
     if (!route){
-      setResult("<strong>We could not calculate a route for that address.</strong><br>Please try again or contact us for confirmation.");
+      setResult("<strong>We could not calculate a route.</strong><br>Please try again or contact us for confirmation.");
       return;
     }
 
-    const miles = metersToMiles(route.distanceMeters);
-    const milesRounded = round1(miles);
+    const milesRounded = round1(metersToMiles(route.distanceMeters));
     const policy = feePolicy(milesRounded);
 
-    // Marker
     if (clientMarker) map.removeLayer(clientMarker);
     clientMarker = L.marker([place.lat, place.lon], { pane: "markers-top" })
       .addTo(map)
       .bindPopup(`<strong>Your location</strong><br>${place.label}`)
       .openPopup();
 
-    // Route line
-    if (routeLine) map.removeLayer(routeLine);
-    if (route.geometry && route.geometry.type === "LineString"){
-      routeLine = L.geoJSON(route.geometry, { pane: "route-line", style: () => ({ weight: 4, opacity: 0.9 }) })
-        .addTo(map);
-    }
-
-    // Fit bounds
     const bounds = L.latLngBounds([[origin.lat, origin.lon], [place.lat, place.lon]]);
     map.fitBounds(bounds.pad(0.25));
-
-    const feeText = policy.fee === null ? "Custom quote" : money(policy.fee);
 
     setResult(
       `<div style="font-weight:900;margin-bottom:6px;">Your travel fee</div>
        <div><strong>Driving distance:</strong> ${milesRounded} miles</div>
        <div><strong>Tier:</strong> ${policy.tier}</div>
-       <div><strong>Per-visit travel fee:</strong> ${feeText}</div>
-       <div style="margin-top:6px;opacity:0.9;">${policy.note}</div>`
+       <div><strong>Per-visit travel fee:</strong> ${policy.fee === null ? "Custom quote" : money(policy.fee)}</div>`
     );
   }
 
