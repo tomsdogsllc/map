@@ -50,7 +50,7 @@
 
   #td-geo-map{
     height:100%;
-    max-width:100%;
+    width:100%;
     border-radius: var(--td-radius);
     border: 1px solid var(--td-border);
     box-shadow: var(--td-shadow);
@@ -89,6 +89,25 @@
     background: rgba(255,246,229,0.96) !important;
     border: 1px solid rgba(49,85,50,0.14);
   }
+
+  .td-popup-title{
+    font-weight: 800;
+    font-size: 14px;
+    margin: 0 0 6px 0;
+    color: rgba(15,27,18,0.92);
+  }
+  .td-popup-sub{
+    font-weight: 700;
+    font-size: 12px;
+    margin: 0;
+    color: rgba(15,27,18,0.72);
+  }
+  .td-popup-note{
+    font-weight: 700;
+    font-size: 12px;
+    margin: 8px 0 0 0;
+    color: rgba(49,85,50,0.86);
+  }
 </style>
 
 <div class="td-geo-app">
@@ -110,9 +129,28 @@
 
   const milesToMeters = mi => Math.round(mi * 1609.344);
 
-  // Drop radius by 5 miles: 25 -> 20
   const zoneMiles = 17;
   const zoneMeters = milesToMeters(zoneMiles);
+
+  // Popular trail pins (geocoded by name+town; then filtered to the isoline polygon)
+  const trails = [
+    { name: "Rocky Neck State Park", address: "Rocky Neck State Park, East Lyme, CT" },
+    { name: "Oswegatchie Hills Nature Preserve", address: "Oswegatchie Hills Nature Preserve, East Lyme, CT" },
+    { name: "Avery Farm Nature Preserve", address: "Avery Farm Nature Preserve, Ledyard, CT" },
+    { name: "Harkness Memorial State Park", address: "Harkness Memorial State Park, Waterford, CT" },
+    { name: "Nehantic State Forest", address: "Nehantic State Forest, East Lyme, CT" },
+    { name: "Gillette Castle State Park", address: "Gillette Castle State Park, East Haddam, CT" },
+    { name: "Lay Allen Preserve", address: "Lay Allen Preserve, Old Lyme, CT" },
+    { name: "The Griswold Preserve", address: "The Griswold Preserve, Old Lyme, CT" },
+    { name: "Darrow Pond Property", address: "Darrow Pond, Lyme, CT" },
+    { name: "Connecticut College Arboretum", address: "Connecticut College Arboretum, New London, CT" },
+    { name: "Stenger Farm", address: "Stenger Farm Park, Waterford, CT" },
+    { name: "Bluff Point State Park", address: "Bluff Point State Park, Groton, CT" },
+    { name: "Haley Farm State Park", address: "Haley Farm State Park, Groton, CT" },
+    { name: "Upper Three Mile River Preserve", address: "Upper Three Mile River Preserve, East Lyme, CT" },
+    { name: "Mitchell Woods", address: "Mitchell Woods, New London, CT" },
+    { name: "Mamacoke Hill", address: "Mamacoke Hill Preserve, Waterford, CT" }
+  ];
 
   const map = L.map("td-geo-map", { scrollWheelZoom: false })
     .setView([origin.lat + 0.070, origin.lon], 11);
@@ -133,7 +171,10 @@
   map.createPane("markers-top");
   map.getPane("markers-top").style.zIndex = 650;
 
-  // Marker
+  map.createPane("markers-trails");
+  map.getPane("markers-trails").style.zIndex = 640;
+
+  // Icons
   const originIcon = L.icon({
     iconUrl: `https://api.geoapify.com/v2/icon/?type=circle&color=%23315532&strokeColor=%230f1b12&size=44&icon=home&iconType=awesome&contentSize=24&noWhiteCircle&scaleFactor=2&apiKey=${apiKey}`,
     iconSize: [44, 44],
@@ -141,16 +182,23 @@
     popupAnchor: [0, -26]
   });
 
+  const trailIcon = L.icon({
+    iconUrl: `https://api.geoapify.com/v2/icon/?type=circle&color=%23D9772A&strokeColor=%230f1b12&size=42&icon=tree&iconType=awesome&contentSize=22&noWhiteCircle&scaleFactor=2&apiKey=${apiKey}`,
+    iconSize: [42, 42],
+    iconAnchor: [21, 21],
+    popupAnchor: [0, -24]
+  });
+
   L.marker([origin.lat, origin.lon], { icon: originIcon, pane: "markers-top" })
     .addTo(map)
     .bindPopup(`Home Base: ${originName}`);
 
-  // Service area style: light green fill
+  // Service area style
   const serviceFill = "rgba(94,124,96,0.30)";
   const serviceOutline = "rgba(49,85,50,0.78)";
-
-  // Outside dim overlay
   const outsideDimFill = "rgba(15,27,18,0.55)";
+
+  let serviceRingLonLat = null; // [[lon,lat],...]
 
   function firstRingFromFeature(feature){
     const g = feature && feature.geometry;
@@ -173,14 +221,83 @@
     return ring.concat([first]);
   }
 
+  // Ray-casting point-in-polygon
+  function pointInPolygonLonLat(point, polygon){
+    if (!polygon || polygon.length < 4) return true; // if no polygon, don't filter
+    const x = point[0], y = point[1];
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const xi = polygon[i][0], yi = polygon[i][1];
+      const xj = polygon[j][0], yj = polygon[j][1];
+      const intersect = ((yi > y) !== (yj > y)) &&
+        (x < (xj - xi) * (y - yi) / ((yj - yi) || 1e-12) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  }
+
+  // Geocode helper (Geoapify)
+  function geocodeOne(text){
+    const url = "https://api.geoapify.com/v1/geocode/search" +
+      `?text=${encodeURIComponent(text)}` +
+      "&format=json&limit=1" +
+      `&apiKey=${encodeURIComponent(apiKey)}`;
+
+    return fetch(url)
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(j => {
+        const item = j && j.results && j.results[0];
+        if (!item || typeof item.lat !== "number" || typeof item.lon !== "number") return null;
+        return { lat: item.lat, lon: item.lon };
+      })
+      .catch(() => null);
+  }
+
+  const trailLayer = L.layerGroup([], { pane: "markers-trails" }).addTo(map);
+
+  function addTrailPins(){
+    trailLayer.clearLayers();
+
+    const tasks = trails.map(t =>
+      geocodeOne(`${t.address}`).then(pt => ({ ...t, pt }))
+    );
+
+    Promise.all(tasks).then(results => {
+      results.forEach(t => {
+        if (!t.pt) return;
+
+        const isInside = pointInPolygonLonLat([t.pt.lon, t.pt.lat], serviceRingLonLat);
+        if (!isInside) return;
+
+        const popupHtml =
+          `<div class="td-popup-title">${t.name}</div>` +
+          `<div class="td-popup-sub">${t.address}</div>` +
+          `<div class="td-popup-note">Popular trail spot</div>`;
+
+        L.marker([t.pt.lat, t.pt.lon], { icon: trailIcon, pane: "markers-trails" })
+          .bindPopup(popupHtml)
+          .addTo(trailLayer);
+      });
+    });
+  }
+
   function drawSingleZone(data){
     const zoneFeature = (data.features || []).find(
       f => typeof f?.properties?.range === "number" && f.properties.range === zoneMeters
     );
-    if (!zoneFeature) return;
+    if (!zoneFeature) {
+      addTrailPins();
+      return;
+    }
 
     const ring = ensureClosed(firstRingFromFeature(zoneFeature));
-    if (!ring) return;
+    if (!ring) {
+      addTrailPins();
+      return;
+    }
+
+    // Save for filtering trail pins
+    serviceRingLonLat = ring;
 
     // Dim everything outside the service area (world polygon with a hole)
     const worldOuter = [
@@ -190,7 +307,6 @@
       [-180,  90],
       [-180, -90]
     ];
-
     const innerHole = ring.slice().reverse();
 
     const maskFeature = {
@@ -237,6 +353,8 @@
       const b = layer.getBounds();
       map.fitBounds(b.extend([origin.lat, origin.lon]).pad(0.13));
     } catch(e){}
+
+    addTrailPins();
   }
 
   const isolineUrl =
@@ -246,6 +364,9 @@
   fetch(isolineUrl)
     .then(res => res.json())
     .then(drawSingleZone)
-    .catch(() => {});
+    .catch(() => {
+      serviceRingLonLat = null;
+      addTrailPins();
+    });
 })();
 </script>
